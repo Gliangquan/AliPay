@@ -1,58 +1,66 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+  <div id="payDiv">
+    <input
+      v-model="orderInfo.oid"
+      placeholder="请输入订单号"
+      placeholder-class="input-placeholder"
+      @input="onInput"
+    />
+    <input
+      v-model="orderInfo.subject"
+      placeholder="请输入商品名称"
+      placeholder-class="input-placeholder"
+      @input="onInput"
+    />
+    <input
+      v-model="orderInfo.total"
+      placeholder="请输入商品价格"
+      placeholder-class="input-placeholder"
+      @input="onInput"
+    />
+    <input
+      v-model="orderInfo.desc"
+      placeholder="请输入商品描述"
+      placeholder-class="input-placeholder"
+      @input="onInput"
+    />
+    <input
+      v-model="orderInfo.product"
+      placeholder="请输入商品ID"
+      placeholder-class="input-placeholder"
+      @input="onInput"
+    />  
+    <button type="primary" @click="payInfo">测试支付宝支付</button>
   </div>
 </template>
 
 <script>
+const axios = require('axios');
 export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
+  data() {
+    return {
+      orderInfo: {
+        "oid": "0001",
+        "subject": "123456",
+        "total": "100",
+        "desc": "test",
+        "product": "Aa001"
+      }
+    };
+  },
+  methods: {
+    async payInfo() {
+      const res = await axios.post('http://localhost:8081/alipay2', this.orderInfo);
+      if (res.data.code === 0) {
+        const div = document.createElement("div");
+        div.innerHTML = res.data.data; // data就是接口返回的form 表单字符串
+        const payDiv=document.getElementById("payDiv")
+        payDiv.appendChild(div);
+        document.forms[0].submit();
+      } else {
+        console.log('支付失败');
+      }
+    }
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>
